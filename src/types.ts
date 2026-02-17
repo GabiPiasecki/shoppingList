@@ -31,3 +31,8 @@ export interface ComparisonResult {
   bestSingleStore: SingleStoreResult;
   bestSplit: SplitResult;
 }
+
+export interface User {
+  username: string;
+  passwordHash: string;
+}
