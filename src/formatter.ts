@@ -1,5 +1,13 @@
 import { ComparisonResult } from "./types";
 
+const HAS_HEBREW = /[\u0590-\u05FF]/;
+
+function fixRtl(str: string): string {
+  if (!HAS_HEBREW.test(str)) return str;
+  // Reverse the string so Hebrew reads correctly in LTR terminals
+  return [...str].reverse().join("");
+}
+
 function pad(str: string, len: number): string {
   return str.padEnd(len);
 }
@@ -28,7 +36,7 @@ export function formatResults(result: ComparisonResult): string {
   lines.push(`  ${divider(col1)} ${divider(col2)}`);
 
   for (const item of bestSingleStore.items) {
-    lines.push(`  ${pad(item.product, col1)} ${pad(formatPrice(item.price), col2)}`);
+    lines.push(`  ${pad(fixRtl(item.product), col1)} ${pad(formatPrice(item.price), col2)}`);
   }
 
   lines.push(`  ${divider(col1)} ${divider(col2)}`);
@@ -36,7 +44,7 @@ export function formatResults(result: ComparisonResult): string {
 
   if (bestSingleStore.missing.length > 0) {
     lines.push("");
-    lines.push(`  Not available: ${bestSingleStore.missing.join(", ")}`);
+    lines.push(`  Not available: ${bestSingleStore.missing.map(fixRtl).join(", ")}`);
   }
 
   // Split order section
@@ -50,7 +58,7 @@ export function formatResults(result: ComparisonResult): string {
 
   for (const item of bestSplit.items) {
     lines.push(
-      `  ${pad(item.product, col1)} ${pad(item.vendor, col3)} ${pad(formatPrice(item.price), col2)}`
+      `  ${pad(fixRtl(item.product), col1)} ${pad(item.vendor, col3)} ${pad(formatPrice(item.price), col2)}`
     );
   }
 
@@ -61,7 +69,7 @@ export function formatResults(result: ComparisonResult): string {
 
   if (bestSplit.missing.length > 0) {
     lines.push("");
-    lines.push(`  Not available anywhere: ${bestSplit.missing.join(", ")}`);
+    lines.push(`  Not available anywhere: ${bestSplit.missing.map(fixRtl).join(", ")}`);
   }
 
   // Savings summary

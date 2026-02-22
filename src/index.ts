@@ -1,7 +1,9 @@
-import { vendors } from "./data/vendors";
+import { vendors as mockVendors } from "./data/vendors";
+import { fetchShufersalData } from "./data/shufersal";
 import { compare } from "./compare";
 import { formatResults } from "./formatter";
 import { promptAuth } from "./auth";
+import { Vendor } from "./types";
 
 async function main() {
   await promptAuth();
@@ -21,6 +23,16 @@ async function main() {
   }
 
   console.log(`\nShopping list: ${shoppingList.join(", ")}`);
+
+  const vendors: Vendor[] = [...mockVendors];
+
+  try {
+    const shufersal = await fetchShufersalData();
+    vendors.push(shufersal);
+  } catch (err: any) {
+    console.warn(`Warning: could not load Shufersal data — ${err.message}`);
+    console.warn("Continuing with mock vendors only.\n");
+  }
 
   const result = compare(shoppingList, vendors);
   console.log(formatResults(result));
